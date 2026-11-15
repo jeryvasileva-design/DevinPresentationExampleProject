@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="bg">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="site.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales/bg.global.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="script.js" defer></script>
+    <title>Профил</title>
+    <style>
+        body {
+            background-color: #FAF3EB;
+            font-family: 'Sofia Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .bg-wine {
+            background-color: #914E59;
+        }
+
+        .text-wine {
+            color: #914E59;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            transition: 0.2s ease;
+        }
+
+        .fc-event {
+            background-color: #914E59 !important;
+            border: none !important;
+            padding: 2px 5px;
+            cursor: pointer;
+        }
+
+        .fc-toolbar-title {
+            color: #914E59;
+            font-weight: bold;
+        }
+
+        .fc-button-primary {
+            background-color: #914E59 !important;
+            border: none !important;
+        }
+
+        #logoutBtn {
+            font-family: 'Sofia Sans', sans-serif;
+            font-weight: bold;
+            background-color: #a8c0c4;
+            padding: 14px 40px;
+            color: #914E59;
+            cursor: pointer;
+            border-radius: 10px;
+            border: 2px dashed #a8c0c4;
+            box-shadow: rgba(50, 50, 93, 0.25) 0px 2px 5px -1px, rgba(0, 0, 0, 0.3) 0px 1px 3px -1px;
+            transition: .4s;
+        }
+
+        #logoutBtn span:last-child {
+            display: none;
+        }
+
+        #logoutBtn:hover {
+            transition: .4s;
+            border: 2px dashed #92afb5;
+            background-color: #fff;
+            color: #a8c0c4;
+        }
+
+        #logoutBtn:active {
+            background-color: #92afb5;
+        }
+
+        .fc-event {
+            background-color: #914E59 !important;
+            border: none !important;
+            border-radius: 4px !important;
+            padding: 2px 5px !important;
+        }
+
+        .fc-event-title,
+        .fc-event-time {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-family: 'Sofia Sans', sans-serif;
+        }
+
+
+        .fc-daygrid-event-dot {
+            display: none !important;
+        }
+
+        .fc-day-today {
+            background-color: rgba(145, 78, 89, 0.1) !important;
+        }
+
+        .fc-button-primary {
+            background-color: #914E59 !important;
+            border-color: #914E59 !important;
+        }
+
+        .fc-button-primary:hover {
+            background-color: #723d46 !important;
+        }
+
+        .modal-content {
+            border: none;
+            border-radius: 15px;
+        }
+
+        .btn-danger {
+            background-color: #d9534f;
+            border: none;
+        }
+
+        .btn-success {
+            background-color: #5cb85c;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header class="bg-wine py-3">
+        <div class="container-fluid d-flex flex-wrap justify-content-between align-items-center px-4 gap-3">
+            <a href="index.html" class="text-light text-decoration-none fw-bold fs-4">РИСУВАНЕ С ВИНО</a>
+            <nav>
+                <ul class="list-unstyled d-flex flex-wrap gap-4 mb-0 align-items-center">
+                    <li><a href="login.html" class="text-light fw-bold text-decoration-none" id="registerLink">Вход / Регистрация</a></li>
+                    <li class="nav-item d-none" id="save"><a class="nav-link text-light fw-bold text-decoration-none" href="SaveHour.html">Запази час</a></li>
+                    <li class="nav-item d-none" id="acc"><a class="nav-link text-light fw-bold text-decoration-none" href="account.html">Профил</a></li>
+                    <li><button id="logoutBtn" class="d-none">Изход</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="container my-5">
+        <h1 id="accEventName" class="col-12 d-flex justify-content-center fw-bold text-center" style="font-size: 50px; padding: 0.5%;">Събитията на</h1>
+        <p class="col-12 d-flex justify-content-center fs-5 text-center" style="padding: 2%;">Управлявайте своите резервации с лекота.
+            Проследявайте, редактирайте или премахнете своите събития директно през личния си календар.</p>
+        <div id="calendar" class="shadow p-4 bg-white rounded"></div>
+    </section>
+
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-wine text-white">
+                    <h5 class="modal-title">Управление на събитие</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="editEventId">
+                    <div class="mb-3">
+                        <label class="form-label">Вид събитие</label>
+                        <select id="editTitle" class="form-select">
+                            <option value="Среща за влюбени">Среща за влюбени</option>
+                            <option value="Вечер по женски">Вечер по женски</option>
+                            <option value="Събитие с приятели">Събитие с приятели</option>
+                            <option value="Семейно събитие">Семейно събитие</option>
+                            <option value="За малките художници">За малките художници</option>
+                            <option value="Работна среща">Работна среща</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Дата</label>
+                        <input type="date" id="editDate" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Час</label>
+                        <select id="editTime" class="form-select">
+                            <option value="" disabled>Избери час...</option>
+                            <option value="09:00:00">09:00</option>
+                            <option value="10:00:00">10:00</option>
+                            <option value="11:00:00">11:00</option>
+                            <option value="12:00:00">12:00</option>
+                            <option value="13:00:00">13:00</option>
+                            <option value="14:00:00">14:00</option>
+                            <option value="15:00:00">15:00</option>
+                            <option value="16:00:00">16:00</option>
+                            <option value="17:00:00">17:00</option>
+                            <option value="18:00:00">18:00</option>
+                            <option value="19:00:00">19:00</option>
+                            <option value="20:00:00">20:00</option>
+                            <option value="21:00:00">21:00</option>
+                        </select>
+                    </div>
+                    <div id="errorMessage" class="alert alert-danger d-none" role="alert"></div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-danger" id="deleteEventBtn">Изтрий</button>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмени</button>
+                        <button type="button" class="btn btn-success" id="saveEditBtn">Запази промените</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-wine text-light text-center py-4 mt-5">
+        <h2 class="fs-4 fw-bold mb-1">РИСУВАНЕ <br>С ВИНО</h2>
+        <p class="small mb-0">paintingwithwine@gmail.com · +(359) 573-3085</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const userId = localStorage.getItem('userId');
+            if (!userId) { window.location.href = 'login.html'; return; }
+
+            document.getElementById('accEventName').textContent =
+                'Събитията на ' + localStorage.getItem('userName');
+
+            const calendarEl = document.getElementById('calendar');
+            const editDateInput = document.getElementById('editDate');
+            const editTimeSelect = document.getElementById('editTime');
+
+            // not in the past
+            editDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+
+            // filter the hours
+            function filterEditHours() {
+                const selectedDate = editDateInput.value;
+                const now = new Date();
+                const todayStr = now.toISOString().split('T')[0];
+                const curH = now.getHours();
+                const curM = now.getMinutes();
+
+                Array.from(editTimeSelect.options).forEach(option => {
+                    if (!option.value) return;
+                    const [optH, optM] = option.value.split(':').map(Number);
+                    if (selectedDate === todayStr) {
+                        if (optH < curH || (optH === curH && optM <= curM)) {
+                            option.disabled = true; option.style.display = 'none';
+                        } else {
+                            option.disabled = false; option.style.display = 'block';
+                        }
+                    } else {
+                        option.disabled = false; option.style.display = 'block';
+                    }
+                });
+            }
+
+            editDateInput.addEventListener('change', filterEditHours);
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'bg',
+                events: '/api/events?userId=' + userId,
+                eventClick: function (info) {
+                    const ev = info.event;
+                    $('#editEventId').val(ev.id);
+                    $('#editTitle').val(ev.title);
+
+                    const dateStr = ev.start.toLocaleDateString('en-CA');
+                    const timeStr = ev.start.toTimeString().split(' ')[0];
+
+                    $('#editDate').val(dateStr);
+                    filterEditHours();
+                    $('#editTime').val(timeStr);
+
+                    $('#errorMessage').addClass('d-none');
+                    new bootstrap.Modal(document.getElementById('eventModal')).show();
+                }
+            });
+            calendar.render();
+
+            $('#saveEditBtn').click(function () {
+                const updateData = {
+                    id: $('#editEventId').val(),
+                    title: $('#editTitle').val(),
+                    date: $('#editDate').val(),
+                    time: $('#editTime').val()
+                };
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/events/update',
+                    data: updateData,
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.status === 'Success') {
+                            bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
+                            calendar.refetchEvents();
+                            alert("Промените са записани!");
+                        } else {
+                            $('#errorMessage').text(res.message).removeClass('d-none');
+                        }
+                    },
+                    error: function () { alert("Грешка при връзка със сървъра."); }
+                });
+            });
+
+            $('#deleteEventBtn').click(function () {
+                if (confirm("Сигурни ли сте?")) {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/api/events/delete',
+                        data: { id: $('#editEventId').val() },
+                        success: function () {
+                            bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
+                            calendar.refetchEvents();
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

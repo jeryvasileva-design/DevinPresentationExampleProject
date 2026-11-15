@@ -1,0 +1,64 @@
+body {
+    background-color: #FAF3EB;
+    font-family: 'Sofia Sans', sans-serif;
+    overflow-x: hidden;
+}
+
+.bg-wine { background-color: #914E59; }
+.text-wine { color: #914E59; }
+.bg-purple { background-color: #D5DBF8; }
+.bg-pink {
+            background-color: #F5D0DC;
+        }
+
+.btn-wine {
+    background-color: #914E59;
+    color: #fff;
+    border: none;
+}
+.btn-wine:hover { background-color: #7a3f49; color: #fff; }
+
+#logoutBtn {
+    font-family: 'Sofia Sans', sans-serif;
+    font-weight: bold;
+    background-color: #a8c0c4;
+    padding: 10px 28px;
+    color: #914E59;
+    cursor: pointer;
+    border-radius: 10px;
+    border: 2px dashed #a8c0c4;
+    transition: .4s;
+}
+#logoutBtn:hover { border: 2px dashed #92afb5; background-color: #fff; color: #a8c0c4; }
+
+/* calendar */
+.fc-event { background-color: #914E59 !important; border: none !important; padding: 2px 5px; cursor: pointer; }
+.fc-toolbar-title { color: #914E59; font-weight: bold; }
+.fc-button-primary { background-color: #914E59 !important; border: none !important; }
+
+/* login / registration flip card */
+.form-control-underline {
+    border: none;
+    border-bottom: 1px solid #ccc;
+    border-radius: 0;
+    background-color: transparent;
+    padding-left: 0;
+}
+.flip-main-container { perspective: 2000px; display: flex; justify-content: center; align-items: center; padding: 40px 0; }
+.flip-card-inner {
+    width: 1000px; max-width: 95%; height: 650px; position: relative;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d;
+}
+.is-flipped { transform: rotateY(180deg); }
+.auth-side {
+    position: absolute; width: 100%; height: 100%; backface-visibility: hidden;
+    background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+.auth-back { transform: rotateY(180deg); }
+.side-panel {
+    width: 100%; height: 100%; background: linear-gradient(160deg, #914E59, #5e2f38);
+    color: #FAF3EB; display: flex; flex-direction: column; justify-content: center; align-items: center;
+    text-align: center; padding: 2rem;
+}
+.btn-custom { background-color: #914E59; color: white; padding: 12px 30px; border-radius: 6px; border: none; transition: 0.3s; }
+.btn-custom:hover { background-color: #7a3f49; color: #FAF3EB; }
