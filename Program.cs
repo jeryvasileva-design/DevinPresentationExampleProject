@@ -77,13 +77,17 @@ app.MapPost("/api/login", async (HttpRequest req, Store store) =>
     var email = form["email"].ToString().Trim();
     var password = form["password"].ToString();
 
-    User? user;
+    List<User> candidates;
     lock (store.Lock)
     {
-        user = store.FindUserByEmail(email);
+        // Data written before e-mails were unique can still hold several accounts per e-mail.
+        candidates = store.Users
+            .Where(u => string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase))
+            .ToList();
     }
 
-    if (user == null || !user.CheckPassword(password))
+    var user = candidates.FirstOrDefault(u => u.CheckPassword(password));
+    if (user == null)
     {
         return Results.Json(new { status = "Error", message = "Грешен имейл или парола." }, statusCode: 401);
     }
