@@ -223,13 +223,13 @@
             const editTimeSelect = document.getElementById('editTime');
 
             // not in the past
-            editDateInput.setAttribute('min', new Date().toISOString().split('T')[0]);
+            editDateInput.setAttribute('min', new Date().toLocaleDateString('en-CA'));
 
             // filter the hours
             function filterEditHours() {
                 const selectedDate = editDateInput.value;
                 const now = new Date();
-                const todayStr = now.toISOString().split('T')[0];
+                const todayStr = now.toLocaleDateString('en-CA');
                 const curH = now.getHours();
                 const curM = now.getMinutes();
 
@@ -304,10 +304,16 @@
                         type: 'POST',
                         url: '/api/events/delete',
                         data: { id: $('#editEventId').val() },
-                        success: function () {
+                        dataType: 'json',
+                        success: function (res) {
+                            if (res.status !== 'Success') {
+                                $('#errorMessage').text(res.message).removeClass('d-none');
+                                return;
+                            }
                             bootstrap.Modal.getInstance(document.getElementById('eventModal')).hide();
                             calendar.refetchEvents();
-                        }
+                        },
+                        error: function () { alert("Грешка при връзка със сървъра."); }
                     });
                 }
             });

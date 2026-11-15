@@ -22,8 +22,18 @@ public class Store
     {
         _dir = dir;
         Directory.CreateDirectory(_dir);
-        SeedDemoData();
+        if (!Load())
+        {
+            SeedDemoData();
+            Save();
+        }
     }
+
+    private string UsersFile => Path.Combine(_dir, "users.json");
+    private string BookingsFile => Path.Combine(_dir, "bookings.json");
+
+    public User? FindUserByEmail(string email) =>
+        Users.FirstOrDefault(u => string.Equals(u.Email, email, StringComparison.OrdinalIgnoreCase));
 
     public int NextUserId() => Users.Count == 0 ? 1 : Users.Max(u => u.Id) + 1;
 
@@ -31,8 +41,40 @@ public class Store
 
     public void Save()
     {
-        File.WriteAllText(Path.Combine(_dir, "users.json"), JsonSerializer.Serialize(Users, JsonOptions));
-        File.WriteAllText(Path.Combine(_dir, "bookings.json"), JsonSerializer.Serialize(Bookings, JsonOptions));
+        File.WriteAllText(UsersFile, JsonSerializer.Serialize(Users, JsonOptions));
+        File.WriteAllText(BookingsFile, JsonSerializer.Serialize(Bookings, JsonOptions));
+    }
+
+    /// <summary>Loads saved data. Returns false when nothing has been saved yet.</summary>
+    private bool Load()
+    {
+        if (!File.Exists(UsersFile) && !File.Exists(BookingsFile))
+        {
+            return false;
+        }
+
+        if (File.Exists(UsersFile))
+        {
+            Users.AddRange(JsonSerializer.Deserialize<List<User>>(File.ReadAllText(UsersFile), JsonOptions) ?? []);
+        }
+
+        if (File.Exists(BookingsFile))
+        {
+            Bookings.AddRange(JsonSerializer.Deserialize<List<Booking>>(File.ReadAllText(BookingsFile), JsonOptions) ?? []);
+        }
+
+        var legacyUsers = Users.Where(u => !string.IsNullOrEmpty(u.Password)).ToList();
+        foreach (var user in legacyUsers)
+        {
+            user.SetPassword(user.Password!);
+        }
+
+        if (legacyUsers.Count > 0)
+        {
+            Save();
+        }
+
+        return true;
     }
 
     /// <summary>Two demo users, each with two future events, so the calendar is not empty.</summary>
@@ -40,8 +82,12 @@ public class Store
     {
         var today = DateTime.Today;
 
-        Users.Add(new User { Id = 1, UserName = "Мария Иванова", Email = "maria@example.com", Password = "123456" });
-        Users.Add(new User { Id = 2, UserName = "Иван Петров", Email = "ivan@example.com", Password = "123456" });
+        var maria = new User { Id = 1, UserName = "Мария Иванова", Email = "maria@example.com" };
+        var ivan = new User { Id = 2, UserName = "Иван Петров", Email = "ivan@example.com" };
+        maria.SetPassword("123456");
+        ivan.SetPassword("123456");
+        Users.Add(maria);
+        Users.Add(ivan);
 
         Bookings.Add(new Booking
         {

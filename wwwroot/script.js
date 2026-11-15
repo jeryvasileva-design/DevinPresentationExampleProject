@@ -49,8 +49,9 @@ $(document).ready(function () {
                     alert("Грешка: " + response.message);
                 }
             },
-            error: function () {
-                alert("Възникна грешка при свързване със сървъра.");
+            error: function (xhr) {
+                const message = xhr.responseJSON && xhr.responseJSON.message;
+                alert(message || "Възникна грешка при свързване със сървъра.");
             }
         });
     });
